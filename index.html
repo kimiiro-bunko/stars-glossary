@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>stars — 用語集 GLOSSARY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200;300;400&family=Cormorant+Garamond:ital,wght@0,200;0,300;1,200;1,300&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --void: #00000a;
+  --deep: #050510;
+  --nebula-blue: #0a0a2e;
+  --star-white: #f0f4ff;
+  --star-dim: #8090b0;
+  --star-glow: #c8d8ff;
+  --gold: #c8a96e;
+  --accent: #9060ff;
+  --birth: #40c8ff;
+  --sidebar-w: 180px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--void);
+  color: var(--star-white);
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ===== CANVAS ===== */
+#cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Vignette */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,5,0.85) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Scan line */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ===== LAYOUT ===== */
+#app {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+#header {
+  flex-shrink: 0;
+  padding: 24px 40px 18px;
+  border-bottom: 1px solid rgba(120,160,200,0.12);
+  background: linear-gradient(180deg, rgba(0,0,10,0.9) 0%, rgba(0,0,10,0.5) 100%);
+  display: flex;
+  align-items: flex-end;
+  gap: 40px;
+}
+
+#title-block { flex-shrink: 0; }
+
+#title-sub {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 9px;
+  font-weight: 200;
+  color: var(--star-dim);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+#title-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 200;
+  font-style: italic;
+  color: var(--star-white);
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+
+#title-ja {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 10px;
+  font-weight: 200;
+  color: var(--star-dim);
+  letter-spacing: 0.3em;
+  margin-top: 6px;
+}
+
+/* Search */
+#search-wrap {
+  flex: 1;
+  max-width: 360px;
+}
+
+#search {
+  width: 100%;
+  background: rgba(80,120,180,0.07);
+  border: 1px solid rgba(120,160,200,0.18);
+  border-radius: 1px;
+  padding: 7px 14px;
+  color: var(--star-white);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#search::placeholder { color: rgba(128,144,176,0.4); }
+#search:focus { border-color: rgba(120,160,200,0.4); }
+
+/* BGM button */
+#bgm-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid rgba(128,144,176,0.25);
+  color: var(--star-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+}
+#bgm-btn:hover { border-color: var(--birth); color: var(--birth); }
+
+/* ===== MAIN ===== */
+#main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ===== SIDEBAR ===== */
+#sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  border-right: 1px solid rgba(120,160,200,0.08);
+  padding: 28px 0;
+  overflow-y: auto;
+  background: rgba(0,0,8,0.4);
+}
+
+.cat-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 22px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(128,144,176,0.45);
+  transition: all 0.2s;
+  line-height: 1.6;
+}
+.cat-btn:hover { color: rgba(192,210,240,0.7); background: rgba(80,120,180,0.05); }
+.cat-btn.active {
+  color: #b0d0f0;
+  background: linear-gradient(90deg, rgba(80,140,220,0.12) 0%, transparent 100%);
+  border-left-color: rgba(120,180,240,0.5);
+}
+.cat-sym { font-size: 11px; margin-right: 8px; opacity: 0.6; }
+.cat-count { display: block; font-size: 8px; color: rgba(128,144,176,0.3); margin-top: 1px; padding-left: 20px; }
+
+/* ===== CONTENT ===== */
+#content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 36px;
+}
+
+#content::-webkit-scrollbar { width: 3px; }
+#content::-webkit-scrollbar-track { background: transparent; }
+#content::-webkit-scrollbar-thumb { background: rgba(120,160,200,0.15); }
+
+#sidebar::-webkit-scrollbar { width: 2px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb { background: rgba(120,160,200,0.1); }
+
+#content-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(120,160,200,0.08);
+}
+#content-sym { font-size: 18px; opacity: 0.4; }
+#content-title {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(180,210,240,0.65);
+  letter-spacing: 0.25em;
+}
+#content-count { font-size: 9px; color: rgba(128,144,176,0.3); letter-spacing: 0.1em; }
+
+/* Term rows */
+.term-row {
+  border-bottom: 1px solid rgba(120,160,200,0.06);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.term-row:hover { background: rgba(80,130,200,0.04); }
+.term-row.open { background: rgba(80,130,200,0.07); }
+
+.term-top {
+  display: flex;
+  align-items: baseline;
+  padding: 11px 14px;
+  gap: 16px;
+}
+
+.term-name {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12.5px;
+  font-weight: 300;
+  color: #d0e8f8;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  min-width: 240px;
+}
+
+.term-preview {
+  font-size: 11px;
+  color: rgba(160,190,210,0.38);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+  font-family: 'Noto Serif JP', serif;
+}
+
+.term-arrow {
+  flex-shrink: 0;
+  font-size: 8px;
+  color: rgba(128,144,176,0.25);
+  margin-left: auto;
+}
+
+.term-desc {
+  display: none;
+  padding: 0 14px 14px 14px;
+  margin: 0 14px 6px;
+  border-left: 1px solid rgba(100,160,230,0.18);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 2;
+  color: rgba(190,210,230,0.75);
+  letter-spacing: 0.03em;
+}
+.term-row.open .term-desc { display: block; }
+.term-row.open .term-preview { display: none; }
+
+/* Empty */
+#empty {
+  display: none;
+  text-align: center;
+  padding: 60px 0;
+  font-size: 10px;
+  color: rgba(128,144,176,0.3);
+  letter-spacing: 0.2em;
+}
+
+/* Search result header */
+#search-header {
+  display: none;
+  font-size: 9px;
+  color: rgba(128,144,176,0.35);
+  letter-spacing: 0.2em;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(120,160,200,0.06);
+}
+
+/* Loading */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: var(--void);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  transition: opacity 1s ease 0.3s;
+}
+#loading.fade { opacity: 0; pointer-events: none; }
+#loading-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 10px;
+  font-weight: 200;
+  color: var(--star-dim);
+  letter-spacing: 0.6em;
+  text-transform: uppercase;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:0.2} 50%{opacity:0.8} }
+</style>
+</head>
+<body>
+
+<audio id="bgm" src="stars.mp3" loop preload="auto"></audio>
+<canvas id="cosmos"></canvas>
+<div id="loading"><span id="loading-text">initializing glossary</span></div>
+
+<div id="app">
+  <div id="header">
+    <div id="title-block">
+      <div id="title-sub">第十三並行小宇宙《サーティーンズ》</div>
+      <div id="title-main">stars</div>
+      <div id="title-ja">用語集　GLOSSARY</div>
+    </div>
+    <div id="search-wrap">
+      <input id="search" type="text" placeholder="用語を検索… search terms" autocomplete="off" />
+    </div>
+    <button id="bgm-btn">♪ bgm off</button>
+  </div>
+
+  <div id="main">
+    <div id="sidebar"></div>
+    <div id="content">
+      <div id="search-header"></div>
+      <div id="content-header">
+        <span id="content-sym"></span>
+        <span id="content-title"></span>
+        <span id="content-count"></span>
+      </div>
+      <div id="term-list"></div>
+      <div id="empty">— 該当する用語が見つかりません —</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== GLOSSARY DATA =====
+// ★ 用語を追加するには、各カテゴリの配列に { name: "用語名", desc: "説明文" } を追加してください
+const GLOSSARY = {
+  "世界観": [
+    { name: "宇宙空洞（コズミックボイド）", desc: "宇宙に存在する巨大な空洞領域。" },
+    { name: "運命（ᛞ・ウンメイ）", desc: "ルーン文字「Dagaz」に対応する古代語。ホログラフィック原理の宇宙に記述された軌跡でなく、一拍ごとに更新される微小な傾きの連続体として定義される概念。宿命（ᛟ・シュクメイ）と形而上学的に区別される。" },
+    { name: "外れ値（アウトライヤー）", desc: "記述された世界の規則から逸脱する値・存在。宇宙に存在する引っ掻き傷。" },
+    { name: "概念内容（シニフィエ）", desc: "記号が指し示す意味・概念。視覚デバイスが瞬時に表示する情報として機能する。" },
+    { name: "格子暗号（ラティスベース）", desc: "情報転送に用いられる暗号化方式。秘密鍵（プライベートキー）による復号が必要。" },
+    { name: "希望（4・キボウ）", desc: "数字「4」に対応するルーン的概念。" },
+    { name: "記号表現（シニフィアン）", desc: "意味の器となる音・文字などの形式。概念内容（シニフィエ）と対をなす言語学的概念。" },
+    { name: "局所空洞（ローカルボイド）", desc: "宇宙に存在する局所的な空洞領域。" },
+    { name: "光（ᚲ）", desc: "ルーン文字「Kenaz」に対応する概念。" },
+    { name: "座標番号", desc: "第十三並行小宇宙の生命体に割り当てられている存在証明。例：Qb-65536-Swan、PF-65537-Liuto。" },
+    { name: "サーティーンズ（第十三並行小宇宙）", desc: "本作の舞台となる並行小宇宙。ホログラフィック原理により宇宙全体が高次元に記述されているとされる。" },
+    { name: "支配（ᛏ・シハイ）", desc: "ルーン文字「Tiwaz」に対応する概念。ウードの章に用いられる記号。" },
+    { name: "シグニア（隣星）", desc: "エリスタルの隣に位置する文明惑星。推定年齢140億歳。かつての統治層が移住した先。現在はウードら管理局の拠点。エリスタルの天頂に居座り、物言わず地表を監視する。" },
+    { name: "宿命（ᛟ・シュクメイ）", desc: "ルーン文字「Othala」に対応する古代語。運命（ᛞ・ウンメイ）と形而上学的差分（デルタ）を持つ概念。人型原型に組み込まれた設計上の誤りとも表現される。" },
+    { name: "多並行宇宙（マルチバース）", desc: "複数の並行宇宙が存在するとされる概念。PUUNOはこの間を統合的に検索する機能を持つ。" },
+    { name: "エリスタル（この惑星）", desc: "第十三並行小宇宙に浮かぶ本作の舞台惑星。推定年齢140億歳。恒常的に氷点下を記録し、資源が枯渇しつつある。" },
+    { name: "不協和音（ノイズ）", desc: "星の調律師組織が定める「調律されていない状態」。管理局に登録されていない生命体・機体が発する音響的異常として検知される。ガーディアンズにとっては自由の証。" },
+    { name: "文字言語（エクリチュール）", desc: "文字によって記録される言語形式。" },
+    { name: "音声言語（パロール）", desc: "音によって発せられる言語形式。" },
+    { name: "量子情報（Quantum）", desc: "高次元の境界面に記述された世界の情報。第十三並行小宇宙はこれにより構成されるとされる。" },
+  ],
+  "属性": [
+    { name: "和音型（コード）", desc: "両性型の属性。複数の音が重なる「和音」を由来とし、メジャーとマイナー両特性を共鳴・共存させた多層機能を持つ。" },
+    { name: "結晶（クリスタル）", desc: "エリスタルに遺された自然構造物。惑星の記憶をわずかに内包する。現世の技術では再現不可能。純度の高いものは無垢結晶（ピュアクリスタル）と呼ばれる。" },
+    { name: "再重要希少結晶（クリティカルレアクリスタル）", desc: "無垢結晶（ピュアクリスタル）に指定された希少結晶の分類。エリスタルの統治条項により個体での所有と取引が禁止されている。" },
+    { name: "短音型（マイナー）", desc: "女性型の音楽的属性。短調の繊細さ・憂いを由来とし、複雑な倍音・高い共鳴感度・柔軟な適応能力を備える。" },
+    { name: "長音型（メジャー）", desc: "男性型の音楽的属性。長調の力強さを由来とし、明快で剛健な骨格と安定した出力を重視したボディ。" },
+    { name: "培養型獣生命体（クリーチャー）", desc: "富を持つ者の欲望の副産物として生み出された人工獣。次代を残す術を持たず食うか食われるかのみを目的とする。ハイエナなど複数の種が存在する。" },
+    { name: "半獣人型（セリアンプロトタイプ）", desc: "獣の特性を持つ人型原型の亜種。漆黒の獣毛と強化された爪・牙・嗅覚を持ち、殺戮に特化した機能美を備える。調律師に多く用いられる。" },
+    { name: "人型原型（ヒューマノイドプロトタイプ）", desc: "本作に登場する基本的な生命体の形態。移行（世代更新）を繰り返すことで生存を継続する。リュートは第三世代、スワンは第五世代。" },
+    { name: "無調型（アトーナル）", desc: "無性型の音楽的属性。特定の調性に縛られず、純粋な機能性・中立性を追求した専門特化型ボディ。" },
+    { name: "無垢結晶（ピュアクリスタル）", desc: "純度の高い結晶の呼称。何百世代分もの生命体を賄えるほどの高密度エネルギーを秘める。所有・取引が禁じられている。" },
+  ],
+  "武器・装備": [
+    { name: "逆位相弾（アンチフェイズ）", desc: "敵の追跡波・制圧波を受信し完全逆位相を瞬時に生成して照射・打ち消す兵器。沈黙の休符（サイレント・レスト）の技術的基盤を応用。" },
+    { name: "共鳴壊弾（レゾナンスコラプス）", desc: "敵装備の固有振動数を解析し同周波数を増幅照射して内部崩壊させる爆弾。広域共鳴追跡（ラウド・レゾナンス・トレース）系の装置に特に有効。" },
+    { name: "靴型装具（クライオブーツ）", desc: "寒冷地での行動を補助する足部装備。" },
+    { name: "広域共鳴追跡（ラウド・レゾナンス・トレース）", desc: "管理局が衛星シグニアから惑星全土へ照射する追跡システム。不可視の基準音を放射し、反響を解析して登録外の生命体を特定する。" },
+    { name: "残響地雷（エコーマイン）", desc: "音の残響を記憶・蓄積し一定量に達した瞬間放出する装置。調律師が放った音圧・叫び・センサー波を蓄え最終的に敵自身の音で敵を打つ。" },
+    { name: "指輪型装置（リング）", desc: "指に装着する多機能装置。ナノ・スレッドの引き出しや飛行物体の認証・展開に使用する。" },
+    { name: "沈黙の休符（サイレント・レスト）", desc: "ガーディアンズが開発した追跡回避技術。音を消すのではなく逆位相波を放射し、背景の環境音に溶け込ませる偽装方式。" },
+    { name: "調音杖（タクト）", desc: "ガーディアンズが使用する装備・器具の一種。" },
+    { name: "手首装着型装備（リストブレーサー）", desc: "手首に装着する戦闘用装備。球体（雷晶球など）を装着して各種属性攻撃を放つ。" },
+    { name: "統合型生体外皮（シンクロバイオスキン）", desc: "生命体が纏う統合型の生体皮膚・外装。その内側に各種アイテムを収納できる。" },
+    { name: "弦断機雷（ストリングブレイカー）", desc: "地下通路や廃棄配管に仕掛ける音響式機雷。感知した生命体の心拍数と振動パターンを解析し調律師固有のリズムと一致した場合のみ起爆する。" },
+    { name: "電磁網（EMプレクトラム）", desc: "電磁気的な捕獲・制圧用ネットワーク。" },
+    { name: "不協和音波銃（ディスコードウェーブ）", desc: "複数の不合な周波数を同時放射する銃器。調律師の音響感知センサーを過負荷状態に追い込み一時無効化する。" },
+    { name: "防御装備（プロテクター）", desc: "防御用の身体装備。鋼鉄製でも培養型獣生命体の牙に切り裂かれる場合がある。" },
+    { name: "防護服（プロテクトスーツ）", desc: "氷点下の極寒環境で体温を保護するためのスーツ。摂氏マイナス120度超の環境でも体温を奪われる。" },
+    { name: "消音刀（ミュートブレード）", desc: "固有振動を抑制するコーティングが施された近接戦闘用の刃。斬る音も振り下ろす音もしないため調律師の音響知覚に一切の情報を与えない。" },
+    { name: "雷晶球（ライトニングスフィア）", desc: "結晶から成分抽出した球体。手首装着型装備に装着し雷撃を放つ。最大放出で使用回数に制限がある。" },
+    { name: "PUUNO（プーノ）", desc: "多並行宇宙間検索機能を備えた情報・支援AI。生命体に組み込まれており音声で各種情報・解析・システム制御を行う。シナプス電位制御なども指示可能。" },
+    { name: "PUUNO-A（ノア）", desc: "スワンに搭載されたPUUNOの個体。角をもたない丸い声が特徴。感情の記憶も世代移行時に引き継ぐ機能を持つ。" },
+  ],
+  "乗り物・建物": [
+    { name: "音場装幕（サウンドヴェール）", desc: "竪琴の蜂巣（リラハイヴ）外周に展開する音響迷彩システム。内部の生活音を地殻振動と同位相に変換し「地面の普通の音」として偽装する。" },
+    { name: "エアリアルクラフト（流線型の飛行物体）", desc: "リュートが使用する蕎麦切色の飛行物体。指輪型装置でナノ・スレッドを展開することで変形・生成される。PUUNOと連携して目的地への飛行を行う。" },
+    { name: "グリス（浮遊車）", desc: "最も一般的な移動体。超音波共鳴浮上機構で振動プレートのある区域を滑るように走行する。加減速時に弦楽器のビブラートのような低音が響く。" },
+    { name: "コクーン（小規模居住層）", desc: "小規模の居住区域の総称。Cocoon Landing Node（CLN-05）——通称「空の縁」——など複数の拠点が存在する。" },
+    { name: "サニタリートランジット（生体汚染除去区画）", desc: "生体汚染を除去するための通過区画。" },
+    { name: "竪琴の蜂巣（リラハイヴ）", desc: "ガーディアンズの拠点。こと座（Lyra）を由来とする名称。琥珀色の光と雑踏・作業音に満ち、管理局が排除した「ノイズ」が自由の証として鳴り響いている。音場装幕と拍動壁による防衛システムを備える。" },
+    { name: "通過路（トランジットウェイ）", desc: "居住区・施設間を結ぶ通路・経路。" },
+    { name: "拍動壁（パルスウォール）", desc: "竪琴の蜂巣（リラハイヴ）の壁面に埋め込まれた振動素子による能動防御層。外部からの衝撃波・音響爆弾・共鳴攻撃を吸収し内部へ伝達させない。" },
+    { name: "ハーモニクス（高速浮遊機）", desc: "極めて静粛性が高い高速移動体。真空圧差浮上機構で大気を「撫でる」ような静かな移動が可能。富裕層・調律官が隠密移動に使用。" },
+    { name: "ビブラート（小型空中移動機）", desc: "機動力と瞬発力に優れた小型飛行機。重力勾配パルス推進機構で音叉型安定翼により姿勢制御する。スワンが操縦を得意とする。" },
+    { name: "ポッド（ハビタルポッド）", desc: "底辺層が住む球形の個人居住構造物。内部重力・大気組成を自律制御する。内部は曲線的で境界が曖昧な空間。「住む」ではなく「生を保持する」ための物理的空間。" },
+  ],
+  "組織・役職": [
+    { name: "インプロビゼーション（即興旋律班）", desc: "ガーディアンズの攻撃・防衛班。戦場の最前線に立ち決して同じ戦術を繰り返さない。予測不能な即興演奏を武器にする。" },
+    { name: "エコー・スカベンジャー（残響猟師）", desc: "地上や廃棄コクーンの深部へ潜り旧時代の遺物・回路に残された波形データ・生活の残響を回収する者たち。管理局が消し去った「過去の旋律」を繋ぎ止めることを戦いとする。" },
+    { name: "カウンターポイント（対位法班）", desc: "ガーディアンズの諜報・作戦立案班。敵のすべての動きに拮抗する旋律を用意し、打たれる前に次手を知る者たち。" },
+    { name: "チューニングメカニック（調音工）", desc: "装備・設備の音響状態を保守する技術者。ガーディアンズ拠点では機械修理を「調音」と呼びスパナの音さえも音楽の一部として扱う。" },
+    { name: "調律官（テンペラント）", desc: "星の調律師組織における中間管理職。調律師より上位の階級。" },
+    { name: "調律師（チューナー）", desc: "星の調律師組織に属する捕獲・制圧担当の構成員。弱者を「錆びた弦」「不協和音」と呼び、調律（命の停止）を業務とする。人型型と半獣型の両種が存在する。" },
+    { name: "総監（マエストロ）", desc: "ウードが自ら称する星の調律師組織の頂点の称号。" },
+    { name: "主席調律官（マスター）", desc: "星の調律師組織における最上位管理職。ディアパソンが該当。" },
+    { name: "星の守護（ガーディアンズ）", desc: "調律師に抵抗する者たちの総称。未調律の者達（アウト・オブ・チューンズ）とも呼ぶ。竪琴の蜂巣（リラハイヴ）を拠点とする。" },
+    { name: "星の低音部（グランド・コンティヌオ）", desc: "略してコンティヌオとも。ガーディアンズの代表であり象徴的存在。" },
+    { name: "バイオハーモニックユニット（生体調音班）", desc: "ガーディアンズ内の生体・医療系専門班。" },
+    { name: "ヴァリアシオン（変奏曲班）", desc: "ガーディアンズの潜入・撹乱・破壊工作専門班。形を変え声を変え音域さえも変えて捕まらず消えず、しかし必ずいる。" },
+  ],
+};
+
+const CAT_SYMBOLS = {
+  "世界観": "✳︎",
+  "属性": "𓆃",
+  "武器・装備": "ᛏ",
+  "乗り物・建物": "⌘",
+  "組織・役職": "ᛞ",
+};
+const CAT_ORDER = ["世界観", "属性", "武器・装備", "乗り物・建物", "組織・役職"];
+
+// ===== STAR FIELD =====
+const canvas = document.getElementById('cosmos');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const STARS = [];
+for (let i = 0; i < 700; i++) {
+  STARS.push({
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random() * 1.1 + 0.2,
+    brightness: Math.random(),
+    twinkle: Math.random() * Math.PI * 2,
+    twinkleSpeed: 0.008 + Math.random() * 0.02,
+  });
+}
+
+// Shooting stars
+const SHOOTING = [];
+function spawnShooting() {
+  SHOOTING.push({
+    x: Math.random() * 1.2 - 0.1,
+    y: Math.random() * 0.5,
+    vx: 0.003 + Math.random() * 0.004,
+    vy: 0.001 + Math.random() * 0.002,
+    len: 0.06 + Math.random() * 0.08,
+    alpha: 1,
+    life: 1,
+  });
+}
+setInterval(spawnShooting, 3200 + Math.random() * 2000);
+
+let t = 0;
+function drawCosmos() {
+  t++;
+  ctx.fillStyle = '#00000a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nebula
+  const nb = ctx.createRadialGradient(W*0.3, H*0.4, 0, W*0.3, H*0.4, W*0.35);
+  nb.addColorStop(0, 'rgba(30,20,80,0.06)');
+  nb.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = nb;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  for (const s of STARS) {
+    s.twinkle += s.twinkleSpeed;
+    const tw = Math.sin(s.twinkle) * 0.35 + 0.65;
+    ctx.fillStyle = `rgba(200,220,255,${s.brightness * tw * 0.75})`;
+    ctx.beginPath();
+    ctx.arc(s.x * W, s.y * H, Math.max(0.3, s.size), 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Shooting stars
+  for (let i = SHOOTING.length - 1; i >= 0; i--) {
+    const s = SHOOTING[i];
+    s.life -= 0.012;
+    s.x += s.vx;
+    s.y += s.vy;
+    if (s.life <= 0) { SHOOTING.splice(i, 1); continue; }
+    const alpha = s.life > 0.3 ? s.life : s.life / 0.3;
+    const grd = ctx.createLinearGradient(
+      s.x * W, s.y * H,
+      (s.x - s.len) * W, (s.y - s.len * 0.5) * H
+    );
+    grd.addColorStop(0, `rgba(240,248,255,${alpha * 0.9})`);
+    grd.addColorStop(0.3, `rgba(180,210,255,${alpha * 0.4})`);
+    grd.addColorStop(1, 'rgba(180,210,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(s.x * W, s.y * H);
+    ctx.lineTo((s.x - s.len) * W, (s.y - s.len * 0.5) * H);
+    ctx.strokeStyle = grd;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+    // Head glow
+    ctx.beginPath();
+    ctx.arc(s.x * W, s.y * H, 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(240,248,255,${alpha * 0.8})`;
+    ctx.fill();
+  }
+
+  requestAnimationFrame(drawCosmos);
+}
+drawCosmos();
+
+// ===== APP STATE =====
+let activeCategory = CAT_ORDER[0];
+let openItem = null;
+let searchQuery = '';
+
+// ===== RENDER SIDEBAR =====
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = CAT_ORDER.map(cat => `
+    <button class="cat-btn${cat === activeCategory ? ' active' : ''}" data-cat="${cat}">
+      <span class="cat-sym">${CAT_SYMBOLS[cat]}</span>${cat}
+      <span class="cat-count">${GLOSSARY[cat].length} 項目</span>
+    </button>
+  `).join('');
+  sb.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.cat;
+      openItem = null;
+      searchQuery = '';
+      document.getElementById('search').value = '';
+      renderSidebar();
+      renderContent();
+    });
+  });
+}
+
+// ===== SORT =====
+function sortKana(arr) {
+  return [...arr].sort((a, b) => {
+    const na = a.name.replace(/[（(].*/, '').trim();
+    const nb = b.name.replace(/[（(].*/, '').trim();
+    return na.localeCompare(nb, 'ja');
+  });
+}
+
+// ===== RENDER CONTENT =====
+function renderContent() {
+  const isSearch = searchQuery.length > 0;
+  const sh = document.getElementById('search-header');
+  const ch = document.getElementById('content-header');
+  const list = document.getElementById('term-list');
+  const empty = document.getElementById('empty');
+
+  let items;
+  if (isSearch) {
+    const q = searchQuery.toLowerCase();
+    items = [];
+    CAT_ORDER.forEach(cat => {
+      GLOSSARY[cat].forEach(item => {
+        if (item.name.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q)) {
+          items.push({ ...item, _cat: cat });
+        }
+      });
+    });
+    sh.style.display = 'block';
+    sh.textContent = `検索結果　"${searchQuery}"　— ${items.length} 件`;
+    ch.style.display = 'none';
+  } else {
+    items = sortKana(GLOSSARY[activeCategory]).map(i => ({ ...i, _cat: activeCategory }));
+    sh.style.display = 'none';
+    ch.style.display = 'flex';
+    document.getElementById('content-sym').textContent = CAT_SYMBOLS[activeCategory];
+    document.getElementById('content-title').textContent = activeCategory;
+    document.getElementById('content-count').textContent = `${items.length} 項目`;
+  }
+
+  empty.style.display = items.length === 0 ? 'block' : 'none';
+
+  list.innerHTML = items.map((item, i) => `
+    <div class="term-row${openItem === i ? ' open' : ''}" data-idx="${i}">
+      <div class="term-top">
+        <div class="term-name">${item.name}</div>
+        <div class="term-preview">${item.desc}</div>
+        <div class="term-arrow">${openItem === i ? '▲' : '▽'}</div>
+      </div>
+      <div class="term-desc">${item.desc}</div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.term-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const idx = parseInt(row.dataset.idx);
+      openItem = openItem === idx ? null : idx;
+      renderContent();
+    });
+  });
+}
+
+// ===== SEARCH =====
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  openItem = null;
+  renderContent();
+});
+
+// ===== BGM =====
+const bgm = document.getElementById('bgm');
+const bgmBtn = document.getElementById('bgm-btn');
+let bgmStarted = false;
+let bgmMuted = false;
+
+function startBGM() {
+  if (bgmStarted) return;
+  bgm.volume = 0.3;
+  bgm.play().then(() => {
+    bgmStarted = true;
+    bgmBtn.textContent = '♪ bgm on';
+  }).catch(() => {});
+}
+
+['click', 'keydown'].forEach(ev => {
+  document.addEventListener(ev, startBGM, { once: true });
+});
+
+bgmBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  if (!bgmStarted) { startBGM(); return; }
+  bgmMuted = !bgmMuted;
+  bgm.muted = bgmMuted;
+  bgmBtn.textContent = bgmMuted ? '♪ bgm off' : '♪ bgm on';
+});
+
+// ===== INIT =====
+window.addEventListener('load', () => {
+  renderSidebar();
+  renderContent();
+  setTimeout(() => {
+    const loading = document.getElementById('loading');
+    loading.classList.add('fade');
+    setTimeout(() => loading.remove(), 1200);
+  }, 800);
+});
+</script>
+</body>
+</html>
